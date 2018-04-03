@@ -6,8 +6,8 @@ import argparse
 import os
 import time
 
-import trackdata
-import trackdata.dataset
+import trackdat
+import trackdat.dataset
 
 alov_dir = 'alov'
 dtb70_dir = os.path.join('dtb70', 'DTB70')
@@ -25,26 +25,26 @@ vot2016_dir = 'vot2016'
 vot2017_dir = 'vot2017'
 
 datasets = [
-    dict(func=trackdata.load_otb, dir=otb_dir, kwargs=dict()),
-    dict(func=trackdata.load_otb, dir=otb_dir, kwargs=dict(subset='cvpr13')),
-    dict(func=trackdata.load_otb, dir=otb_dir, kwargs=dict(subset='tb_50')),
-    dict(func=trackdata.load_otb, dir=otb_dir, kwargs=dict(subset='tb_100')),
-    dict(func=trackdata.load_dtb70, dir=dtb70_dir, kwargs=dict()),
-    dict(func=trackdata.load_tlp, dir=tlp_dir, kwargs=dict()),
-    dict(func=trackdata.load_vot, dir=vot2013_dir, kwargs=dict()),
-    dict(func=trackdata.load_vot, dir=vot2014_dir, kwargs=dict()),
-    dict(func=trackdata.load_vot, dir=vot2015_dir, kwargs=dict()),
-    dict(func=trackdata.load_vot, dir=vot2016_dir, kwargs=dict()),
-    dict(func=trackdata.load_vot, dir=vot2017_dir, kwargs=dict()),
-    dict(func=trackdata.load_nuspro, dir=nuspro_dir, kwargs=dict()),
-    dict(func=trackdata.load_nfs, dir=nfs_dir, kwargs=dict(fps=240)),
-    dict(func=trackdata.load_nfs, dir=nfs_dir, kwargs=dict(fps=30)),
-    dict(func=trackdata.load_tc128, dir=tc128_dir, kwargs=dict(keep_prev=False)),
-    dict(func=trackdata.load_tc128, dir=tc128_dir, kwargs=dict(keep_prev=True)),
-    dict(func=trackdata.load_uav123, dir=uav123_dir, kwargs=dict()),
-    dict(func=trackdata.load_alov, dir=alov_dir, kwargs=dict()),
-    dict(func=trackdata.load_ilsvrc, dir=ilsvrc_dir, kwargs=dict(subset='val')),
-    dict(func=trackdata.load_ilsvrc, dir=ilsvrc_dir, kwargs=dict(subset='train')),
+    dict(func=trackdat.load_otb, dir=otb_dir, kwargs=dict()),
+    dict(func=trackdat.load_otb, dir=otb_dir, kwargs=dict(subset='cvpr13')),
+    dict(func=trackdat.load_otb, dir=otb_dir, kwargs=dict(subset='tb_50')),
+    dict(func=trackdat.load_otb, dir=otb_dir, kwargs=dict(subset='tb_100')),
+    dict(func=trackdat.load_dtb70, dir=dtb70_dir, kwargs=dict()),
+    dict(func=trackdat.load_tlp, dir=tlp_dir, kwargs=dict()),
+    dict(func=trackdat.load_vot, dir=vot2013_dir, kwargs=dict()),
+    dict(func=trackdat.load_vot, dir=vot2014_dir, kwargs=dict()),
+    dict(func=trackdat.load_vot, dir=vot2015_dir, kwargs=dict()),
+    dict(func=trackdat.load_vot, dir=vot2016_dir, kwargs=dict()),
+    dict(func=trackdat.load_vot, dir=vot2017_dir, kwargs=dict()),
+    dict(func=trackdat.load_nuspro, dir=nuspro_dir, kwargs=dict()),
+    dict(func=trackdat.load_nfs, dir=nfs_dir, kwargs=dict(fps=240)),
+    dict(func=trackdat.load_nfs, dir=nfs_dir, kwargs=dict(fps=30)),
+    dict(func=trackdat.load_tc128, dir=tc128_dir, kwargs=dict(keep_prev=False)),
+    dict(func=trackdat.load_tc128, dir=tc128_dir, kwargs=dict(keep_prev=True)),
+    dict(func=trackdat.load_uav123, dir=uav123_dir, kwargs=dict()),
+    dict(func=trackdat.load_alov, dir=alov_dir, kwargs=dict()),
+    dict(func=trackdat.load_ilsvrc, dir=ilsvrc_dir, kwargs=dict(subset='val')),
+    dict(func=trackdat.load_ilsvrc, dir=ilsvrc_dir, kwargs=dict(subset='train')),
 ]
 
 
@@ -61,7 +61,7 @@ def main():
         dur = time.time() - start
         print('number of tracks:', len(dataset.tracks()))
         print('time to load: {:.3g} sec'.format(dur))
-        trackdata.dataset.assert_image_files_exist(dataset_dir, dataset)
+        trackdat.dataset.assert_image_files_exist(dataset_dir, dataset)
 
 
 if __name__ == '__main__':
