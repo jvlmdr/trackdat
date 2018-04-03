@@ -7,7 +7,6 @@ from .dataset import Dataset
 from .otb import load_otb
 from .otb import load_tlp
 from .otb import load_dtb70
-# from .otb import load_otb_format
 from .vot import load_vot
 from .nuspro import load_nuspro
 from .nfs import load_nfs

@@ -1,3 +1,10 @@
+'''
+
+Expects directory structure:
+    {video}/{fps}/{video}/{frame:05d}.jpg
+    {video}/{fps}/{video}.txt
+'''
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function

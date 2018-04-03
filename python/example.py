@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import argparse
 import os
+import time
 
 import trackdata
 import trackdata.dataset
@@ -55,8 +56,11 @@ def main():
     for x in datasets:
         print(x)
         dataset_dir = os.path.join(args.data_root, x['dir'])
+        start = time.time()
         dataset = x['func'](dataset_dir, **x['kwargs'])
+        dur = time.time() - start
         print('number of tracks:', len(dataset.tracks()))
+        print('time to load: {:.3g} sec'.format(dur))
         trackdata.dataset.assert_image_files_exist(dataset_dir, dataset)
 
 

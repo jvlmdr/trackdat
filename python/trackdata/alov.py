@@ -1,3 +1,10 @@
+'''
+
+Expects directory structure:
+    imagedata++/{category}/{video}/{frame:08d}.jpg
+    alov300++_rectangleAnnotation_full/{category}/{video}.ann
+'''
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -17,22 +24,23 @@ def load_alov(dir):
 
 
 def _discover_tracks(dir):
-    categories = filter(re.compile('\d\d-[a-zA-Z]+$').match, util.list_subdirs(dir))
+    images_dir = os.path.join(dir, 'imagedata++')
+    categories = filter(re.compile('\d\d-[a-zA-Z]+$').match, util.list_subdirs(images_dir))
     videos = []
     for category in categories:
         videos.extend(filter(lambda subdir: subdir.startswith(category + '_video'),
-                             util.list_subdirs(os.path.join(dir, category))))
+                             util.list_subdirs(os.path.join(images_dir, category))))
     return videos
 
 
 def _annot_file(video_id):
     category = _category_from_video_id(video_id)
-    return os.path.join(category, video_id + '.ann')
+    return os.path.join('alov300++_rectangleAnnotation_full', category, video_id + '.ann')
 
 
 def _image_file(video_id):
     category = _category_from_video_id(video_id)
-    return os.path.join(category, video_id, '{:08d}.jpg')
+    return os.path.join('imagedata++', category, video_id, '{:08d}.jpg')
 
 
 def _category_from_video_id(video_id):
