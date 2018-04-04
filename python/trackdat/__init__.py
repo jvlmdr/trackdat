@@ -14,3 +14,4 @@ from .tc128 import load_tc128
 from .uav123 import load_uav123
 from .alov import load_alov
 from .ilsvrc import load_ilsvrc
+from .ytbb import load_ytbb_seconds

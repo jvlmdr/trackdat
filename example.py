@@ -23,6 +23,7 @@ vot2014_dir = 'vot2014'
 vot2015_dir = 'vot2015'
 vot2016_dir = 'vot2016'
 vot2017_dir = 'vot2017'
+ytbb_dir = 'ytbb'
 
 datasets = [
     dict(func=trackdat.load_otb, dir=otb_dir, kwargs=dict()),
@@ -43,6 +44,8 @@ datasets = [
     dict(func=trackdat.load_tc128, dir=tc128_dir, kwargs=dict(keep_prev=True)),
     dict(func=trackdat.load_uav123, dir=uav123_dir, kwargs=dict()),
     dict(func=trackdat.load_alov, dir=alov_dir, kwargs=dict()),
+    dict(func=trackdat.load_ytbb_seconds, dir=ytbb_dir, kwargs=dict(subset='validation')),
+    dict(func=trackdat.load_ytbb_seconds, dir=ytbb_dir, kwargs=dict(subset='train')),
     dict(func=trackdat.load_ilsvrc, dir=ilsvrc_dir, kwargs=dict(subset='val')),
     dict(func=trackdat.load_ilsvrc, dir=ilsvrc_dir, kwargs=dict(subset='train')),
 ]
