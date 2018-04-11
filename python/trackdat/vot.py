@@ -22,14 +22,15 @@ def load_vot(dir):
     # Cannot use load_csv_dataset_simple because
     # we use the VOT code to load the regions.
     video_ids = _load_tracks(dir)
-    labels = {}
+    labels_pix = {}
     for video_id in video_ids:
         with open(os.path.join(dir, _annot_file(video_id)), 'r') as f:
-            labels[video_id] = _load_groundtruth(f)
+            labels_pix[video_id] = _load_groundtruth(f)
+    labels, aspects = dataset.convert_relative(dir, video_ids, labels_pix, _image_file)
     return dataset.Dataset(
-        track_ids=video_ids,
-        labels=labels,
-        image_files=util.func_dict(video_ids, _image_file))
+        track_ids=video_ids, labels=labels,
+        image_files=util.func_dict(video_ids, _image_file),
+        aspects=aspects)
 
 
 def _load_tracks(dir):
@@ -52,16 +53,14 @@ def _load_groundtruth(f, init_time=1):
     lines = f.readlines()
     # Strip whitespace and remove empty lines.
     lines = filter(bool, map(str.strip, lines))
-    frames = {}
+    labels_pix = {}
     t = init_time
     for line in lines:
         r = _vot.convert_region(_vot.parse_region(line), 'rectangle')
         # TODO: Confirm that we should subtract 1 here.
         # Perhaps we should rather subtract and add 0.5 from min and max.
-        frames[t] = dataset.make_rect(
-            xmin=r.x - 1,
-            ymin=r.y - 1,
-            xmax=r.x - 1 + r.width,
-            ymax=r.y - 1 + r.height)
+        rect = dataset.make_rect(xmin=r.x - 1, xmax=r.x - 1 + r.width,
+                                 ymin=r.y - 1, ymax=r.y - 1 + r.height)
+        labels_pix[t] = dataset.make_frame_label(rect=rect)
         t += 1
-    return frames
+    return labels_pix

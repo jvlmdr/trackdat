@@ -21,27 +21,29 @@ def load_nfs(dir, fps):
     if len(video_ids) == 0:
         raise RuntimeError('no tracks found')
 
-    labels = {}
+    labels_pix = {}
     for video_id in video_ids:
         annot_file = os.path.join(dir, _annot_file(video_id, fps))
         with open(annot_file, 'r') as f:
             # Ignore 'time' field because it varies between starting at 0 and 1.
-            # labels[video_id] = dataset.load_rects_csv(
-            #     f, fieldnames=['_', 'xmin', 'ymin', 'xmax', 'ymax', 'time'], delim=' ')
-            labels[video_id] = dataset.load_rects_csv(
-                f, fieldnames=['_', 'xmin', 'ymin', 'xmax', 'ymax'], init_time=1, delim=' ')
+            # labels_pix[video_id] = dataset.load_rects_csv(
+            #     f, fieldnames=['', 'xmin', 'ymin', 'xmax', 'ymax', 'time'], delim=' ')
+            labels_pix[video_id] = dataset.load_rects_csv(
+                f, fieldnames=['', 'xmin', 'ymin', 'xmax', 'ymax'], init_time=1, delim=' ')
 
     # Take a subset of the labels.
     if fps != 240:
         if 240 % fps != 0:
             raise RuntimeError('fps does not divide 240: {}'.format(fps))
         freq = 240 // fps
-        labels = {v: _subsample(labels[v], freq) for v in video_ids}
+        labels_pix = {v: _subsample(labels_pix[v], freq) for v in video_ids}
 
+    image_file_fn = functools.partial(_image_file, fps=fps)
+    labels, aspects = dataset.convert_relative(dir, video_ids, labels_pix, image_file_fn)
     return dataset.Dataset(
-        track_ids=video_ids,
-        labels=labels,
-        image_files=util.func_dict(video_ids, functools.partial(_image_file, fps=fps)))
+        track_ids=video_ids, labels=labels,
+        image_files=util.func_dict(video_ids, image_file_fn),
+        aspects=aspects)
 
 
 def _subsample(labels, freq):

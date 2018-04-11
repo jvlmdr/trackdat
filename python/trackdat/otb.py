@@ -70,23 +70,26 @@ def _load_otb_format(dir, track_ids=None, init_times=None, default_init_time=1, 
         if len(track_ids) == 0:
             raise RuntimeError('no tracks found in dir: {}'.format(dir))
 
-    labels = {}
+    labels_pix = {}
     for track_id in track_ids:
         video_id, object_id = _split_track_id(track_id)
         gt_file = _filename_from_object_id(object_id)
         with open(os.path.join(dir, video_id, gt_file), 'r') as f:
-            labels[track_id] = dataset.load_rects_csv(
+            labels_pix[track_id] = dataset.load_rects_csv(
                 f, fieldnames=fieldnames,
                 init_time=init_times.get(track_id, default_init_time),
                 delim='\s+|,')
 
     video_id_map = util.func_dict(track_ids, _video_id_from_track_id)
     video_ids = set(video_id_map.values())
+
+    image_files = {video_id: _infer_image_format(dir, video_id) for video_id in video_ids}
+    labels, aspects = dataset.convert_relative(
+        dir, track_ids, labels_pix, image_files.__getitem__, video_id_map)
+
     return dataset.Dataset(
-        track_ids=track_ids,
-        labels=labels,
-        video_id_map=video_id_map,
-        image_files=util.func_dict(video_ids, lambda v: _infer_image_format(dir, v)))
+        track_ids=track_ids, labels=labels, video_id_map=video_id_map,
+        image_files=image_files, aspects=aspects)
 
 
 def _infer_image_format(dir, video_id):

@@ -26,21 +26,21 @@ def load_uav123(dir, subset='UAV123'):
     track_ids = _load_tracks_subset(dir, subset)
     init_times = _init_times_subset(subset)
 
-    labels = {}
+    labels_pix = {}
     for track_id in track_ids:
         with open(os.path.join(dir, _annot_file(subset, track_id)), 'r') as f:
-            labels[track_id] = dataset.load_rects_csv(
+            labels_pix[track_id] = dataset.load_rects_csv(
                 f, fieldnames=['xmin', 'ymin', 'width', 'height'],
                 init_time=init_times.get(track_id, 1),
                 delim=',')
 
     video_id_map = util.func_dict(track_ids, _video_id_from_track_id)
     video_ids = set(video_id_map.values())
+    labels, aspects = dataset.convert_relative(dir, track_ids, labels_pix, _image_file, video_id_map)
     return dataset.Dataset(
-        track_ids=track_ids,
-        labels=labels,
-        video_id_map=video_id_map,
-        image_files=util.func_dict(video_ids, _image_file))
+        track_ids=track_ids, labels=labels, video_id_map=video_id_map,
+        image_files=util.func_dict(video_ids, _image_file),
+        aspects=aspects)
 
 
 def _load_tracks_subset(dir, subset):

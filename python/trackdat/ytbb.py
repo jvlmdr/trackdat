@@ -1,7 +1,7 @@
 '''
 
 Expects directory structure:
-    yt_bb_detection_{set}.csv
+    {set}/labels_frames.csv
     {set}/frames/{video}/{time_sec:05d}.jpg
 '''
 
@@ -21,9 +21,10 @@ _FIELDNAMES = [
 ]
 
 
-def load_ytbb_seconds(dir, subset):
+def load_ytbb_seconds(dir, subset, no_aspect=False, keep_pure_absent=False):
     '''Loads YTBB dataset with one frame per second.'''
-    csv_file = os.path.join(dir, 'yt_bb_detection_{}.csv'.format(subset))
+    # csv_file = os.path.join(dir, 'yt_bb_detection_{}.csv'.format(subset))
+    csv_file = os.path.join(dir, subset, 'labels_frames.csv')
     video_id_map = {}
     labels = {}
     with open(csv_file, 'r') as f:
@@ -44,28 +45,40 @@ def load_ytbb_seconds(dir, subset):
                 continue
             video_id_map[track_id] = row['youtube_id']
             labels.setdefault(track_id, {})[t] = frame_label
-    num_raw = len(labels)
-    labels = {track_id: track_labels for track_id, track_labels in labels.items()
-              if _num_present(track_labels) > 1}
-    print('remove tracks without present labels: {} of {} remain'.format(len(labels), num_raw))
+    if not keep_pure_absent:
+        num_raw = len(labels)
+        labels = {track_id: track_labels for track_id, track_labels in labels.items()
+                  if _num_present(track_labels) > 1}
+        print('remove tracks without present labels: {} of {} remain'.format(len(labels), num_raw))
     track_ids = list(labels.keys())
-
-    # Check if videos exist.
     video_ids = set(video_id_map.values())
-    video_subset = set([video_id for video_id in video_ids
-                        if os.path.isdir(os.path.join(dir, subset, 'frames', video_id))])
-    track_subset = set([track_id for track_id in track_ids
-                        if video_id_map[track_id] in video_subset])
-    print('found frames for {} of {} videos ({} of {} tracks)'.format(
-        len(video_subset), len(video_ids), len(track_subset), len(track_ids)))
-    # Take subset of tracks for videos that exist.
-    track_ids = [track_id for track_id in track_ids if track_id in track_subset]
-    labels = {track_id: labels[track_id] for track_id in track_subset}
-    video_id_map = {track_id: video_id_map[track_id] for track_id in track_subset}
+    print('num videos:', len(video_ids))
+
+    # # Check if videos exist.
+    # video_subset = set([video_id for video_id in video_ids
+    #                     if os.path.isdir(os.path.join(dir, subset, 'frames', video_id))])
+    # track_subset = set([track_id for track_id in track_ids
+    #                     if video_id_map[track_id] in video_subset])
+    # print('found frames for {} of {} videos ({} of {} tracks)'.format(
+    #     len(video_subset), len(video_ids), len(track_subset), len(track_ids)))
+    # # Take subset of tracks for videos that exist.
+    # video_ids = video_subset
+    # track_ids = [track_id for track_id in track_ids if track_id in track_subset]
+    # labels = {track_id: labels[track_id] for track_id in track_subset}
+    # video_id_map = {track_id: video_id_map[track_id] for track_id in track_subset}
+
+    image_file_fn = lambda v: _image_file(subset, v)
+    # Rectangles are already in relative coordinates.
+    # However we must read images to get aspect ratios.
+    if no_aspect:
+        aspects = None
+    else:
+        aspects = dataset.aspect_from_images(dir, track_ids, labels, image_file_fn, video_id_map)
 
     return dataset.Dataset(
         track_ids=track_ids, labels=labels, video_id_map=video_id_map,
-        image_files=util.func_dict(video_ids, lambda v: _image_file(subset, v)))
+        image_files=util.func_dict(video_ids, image_file_fn),
+        aspects=aspects)
 
 
 def _image_file(subset, video_id):

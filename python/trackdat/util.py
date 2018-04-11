@@ -5,6 +5,8 @@ from __future__ import print_function
 import os
 import re
 
+from PIL import Image
+
 
 def infer_image_file_pattern(dir):
     elems = os.listdir(dir)
@@ -59,3 +61,19 @@ def list_subdirs(dir):
 
 def func_dict(keys, func):
     return {key: func(key) for key in keys}
+
+
+def image_size(fname):
+    # Image.open() is a lazy operation, it does not load the image.
+    # https://pillow.readthedocs.io/en/5.1.x/reference/Image.html
+    im = Image.open(fname)
+    width, height = im.size
+    return {'width': width, 'height': height}
+
+
+def map_dict(f, xs):
+    return dict(f(k, v) for k, v in xs.items())
+
+
+def map_dict_values(f, xs):
+    return {k: f(v) for k, v in xs.items()}

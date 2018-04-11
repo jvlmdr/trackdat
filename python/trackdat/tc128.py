@@ -25,7 +25,7 @@ def load_tc128(dir, keep_prev=False):
     if len(video_ids) == 0:
         raise RuntimeError('no tracks found')
 
-    labels = {}
+    labels_pix = {}
     for video_id in video_ids:
         # Necessary to be case-insensitive.
         frames_file = util.imatch_basename(os.path.join(dir, _frames_file(video_id)))
@@ -33,14 +33,15 @@ def load_tc128(dir, keep_prev=False):
             init_time, _ = _read_frame_range(f)
         gt_file = os.path.join(dir, _annot_file(video_id))
         with open(gt_file, 'r') as f:
-            labels[video_id] = dataset.load_rects_csv(
+            labels_pix[video_id] = dataset.load_rects_csv(
                 f, fieldnames=['xmin', 'ymin', 'width', 'height'],
                 init_time=init_time, delim=',')
 
+    labels, aspects = dataset.convert_relative(dir, video_ids, labels_pix, _image_file)
     return dataset.Dataset(
-        track_ids=video_ids,
-        labels=labels,
-        image_files=util.func_dict(video_ids, _image_file))
+        track_ids=video_ids, labels=labels,
+        image_files=util.func_dict(video_ids, _image_file),
+        aspects=aspects)
 
 
 def _discover_tracks(dir, keep_prev=False):
