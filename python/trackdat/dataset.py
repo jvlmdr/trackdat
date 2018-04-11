@@ -76,6 +76,36 @@ class Dataset(object):
         return self._aspects[video_id]
 
 
+def to_dict(dataset):
+    fields = ['trackids', 'labels', 'video_id_map', 'image_files', 'aspects']
+    content = {field: dataset.__dict__['_' + field] for field in fields}
+    # JSON does not support map with integer keys.
+    # Convert to list of (integer, value) pairs instead.
+    content['labels'] = {track_id: sorted(track.items())
+                         for track_id, track in content['labels'].items()}
+    return content
+
+
+def from_dict(content):
+    content = dict(content)
+    # Convert from list of [t, dict] pairs.
+    content['labels'] = util.map_dict_values(dict, content['labels'])
+    return Dataset(**content)
+
+
+class Serializer(object):
+    '''Provides dump() and load() functions like json, pickle and similar.'''
+
+    def __init__(self, codec):
+        self.codec = codec
+
+    def dump(self, x, f):
+        self.codec.dump(dataset_to_dict(x), f)
+
+    def load(self, f):
+        return dataset_from_dict(self.codec.load(f))
+
+
 def load_csv_dataset_simple(dir, load_videos_fn, annot_file_fn, image_file_fn,
                             fieldnames=None, init_time=None, delim=','):
     '''Load simple dataset (where each video has one track).'''
