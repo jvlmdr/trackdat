@@ -21,7 +21,7 @@ _FIELDNAMES = [
 ]
 
 
-def load_ytbb_seconds(dir, subset, no_aspect=False, keep_pure_absent=False):
+def load_ytbb_sec(dir, subset, no_aspect=False, keep_pure_absent=False):
     '''Loads YTBB dataset with one frame per second.'''
     # csv_file = os.path.join(dir, 'yt_bb_detection_{}.csv'.format(subset))
     csv_file = os.path.join(dir, subset, 'labels_frames.csv')
