@@ -36,7 +36,8 @@ def load_uav123(dir, subset='UAV123'):
 
     video_id_map = util.func_dict(track_ids, _video_id_from_track_id)
     video_ids = set(video_id_map.values())
-    labels, aspects = dataset.convert_relative(dir, track_ids, labels_pix, _image_file, video_id_map)
+    labels, aspects = dataset.convert_relative(
+        dir, track_ids, labels_pix, _image_file, video_id_map)
     return dataset.Dataset(
         track_ids=track_ids, labels=labels, video_id_map=video_id_map,
         image_files=util.func_dict(video_ids, _image_file),
@@ -44,17 +45,17 @@ def load_uav123(dir, subset='UAV123'):
 
 
 def _load_tracks_subset(dir, subset):
-    elems = os.listdir(os.path.join(dir, 'anno', subset))
+    elems = os.listdir(os.path.join(dir, 'UAV123', 'anno', subset))
     annot_files = fnmatch.filter(elems, '*.txt')
     return list(map(_remove_ext, annot_files))
 
 
 def _annot_file(subset, track_id):
-    return os.path.join('anno', subset, track_id + '.txt')
+    return os.path.join('UAV123', 'anno', subset, track_id + '.txt')
 
 
 def _image_file(video_id):
-    return os.path.join('data_seq', 'UAV123', video_id, '{:06d}.jpg')
+    return os.path.join('UAV123', 'data_seq', 'UAV123', video_id, '{:06d}.jpg')
 
 
 def _remove_ext(name):

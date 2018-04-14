@@ -45,7 +45,7 @@ def load_tc128(dir, keep_prev=False):
 
 
 def _discover_tracks(dir, keep_prev=False):
-    subdirs = util.list_subdirs(dir)
+    subdirs = util.list_subdirs(os.path.join(dir, 'Temple-color-128'))
     # Check if annotation file exists.
     video_ids = [subdir for subdir in subdirs
                  if os.path.isfile(os.path.join(dir, _annot_file(subdir)))]
@@ -56,11 +56,11 @@ def _discover_tracks(dir, keep_prev=False):
 
 
 def _annot_file(video_id):
-    return os.path.join(video_id, '{}_gt.txt'.format(video_id))
+    return os.path.join('Temple-color-128', video_id, '{}_gt.txt'.format(video_id))
 
 
 def _frames_file(video_id):
-    return os.path.join(video_id, '{}_frames.txt'.format(video_id))
+    return os.path.join('Temple-color-128', video_id, '{}_frames.txt'.format(video_id))
 
 
 def _read_frame_range(f):
@@ -68,4 +68,4 @@ def _read_frame_range(f):
 
 
 def _image_file(video_id):
-    return os.path.join(video_id, 'img', '{:04d}.jpg')
+    return os.path.join('Temple-color-128', video_id, 'img', '{:04d}.jpg')

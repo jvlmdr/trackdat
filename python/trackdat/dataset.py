@@ -77,7 +77,7 @@ class Dataset(object):
 
 
 def to_dict(dataset):
-    fields = ['trackids', 'labels', 'video_id_map', 'image_files', 'aspects']
+    fields = ['track_ids', 'labels', 'video_id_map', 'image_files', 'aspects']
     content = {field: dataset.__dict__['_' + field] for field in fields}
     # JSON does not support map with integer keys.
     # Convert to list of (integer, value) pairs instead.
@@ -100,10 +100,10 @@ class Serializer(object):
         self.codec = codec
 
     def dump(self, x, f):
-        self.codec.dump(dataset_to_dict(x), f)
+        self.codec.dump(to_dict(x), f)
 
     def load(self, f):
-        return dataset_from_dict(self.codec.load(f))
+        return from_dict(self.codec.load(f))
 
 
 def load_csv_dataset_simple(dir, load_videos_fn, annot_file_fn, image_file_fn,

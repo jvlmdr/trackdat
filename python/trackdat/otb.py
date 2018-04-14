@@ -24,7 +24,7 @@ def load_otb(dir, subset=None):
 
 
 def load_dtb70(dir):
-    return _load_otb_format(dir)
+    return _load_otb_format(dir, subdir='DTB70')
 
 
 def load_tlp(dir):
@@ -50,7 +50,8 @@ def _load_tracks_otb_subset(name):
     return track_ids
 
 
-def _load_otb_format(dir, track_ids=None, init_times=None, default_init_time=1, fieldnames=None):
+def _load_otb_format(dir, track_ids=None, init_times=None, default_init_time=1,
+                     fieldnames=None, subdir=''):
     '''
     Args:
         track_ids: List of strings or None.
@@ -66,15 +67,15 @@ def _load_otb_format(dir, track_ids=None, init_times=None, default_init_time=1, 
         fieldnames = ['xmin', 'ymin', 'width', 'height']
 
     if track_ids is None:
-        track_ids = list(_discover_tracks(dir))
+        track_ids = list(_discover_tracks(dir, subdir=subdir))
         if len(track_ids) == 0:
             raise RuntimeError('no tracks found in dir: {}'.format(dir))
 
     labels_pix = {}
     for track_id in track_ids:
         video_id, object_id = _split_track_id(track_id)
-        gt_file = _filename_from_object_id(object_id)
-        with open(os.path.join(dir, video_id, gt_file), 'r') as f:
+        annot_file = _annot_file(video_id, object_id, subdir=subdir)
+        with open(os.path.join(dir, annot_file), 'r') as f:
             labels_pix[track_id] = dataset.load_rects_csv(
                 f, fieldnames=fieldnames,
                 init_time=init_times.get(track_id, default_init_time),
@@ -83,7 +84,8 @@ def _load_otb_format(dir, track_ids=None, init_times=None, default_init_time=1, 
     video_id_map = util.func_dict(track_ids, _video_id_from_track_id)
     video_ids = set(video_id_map.values())
 
-    image_files = {video_id: _infer_image_format(dir, video_id) for video_id in video_ids}
+    image_files = {video_id: _infer_image_format(dir, video_id, subdir=subdir)
+                   for video_id in video_ids}
     labels, aspects = dataset.convert_relative(
         dir, track_ids, labels_pix, image_files.__getitem__, video_id_map)
 
@@ -92,14 +94,19 @@ def _load_otb_format(dir, track_ids=None, init_times=None, default_init_time=1, 
         image_files=image_files, aspects=aspects)
 
 
-def _infer_image_format(dir, video_id):
-    image_dir = _image_dir(video_id)
+def _infer_image_format(dir, video_id, subdir=''):
+    image_dir = _image_dir(video_id, subdir=subdir)
     fname = util.infer_image_file_pattern(os.path.join(dir, image_dir))
     return os.path.join(image_dir, fname)
 
 
-def _image_dir(video_id):
-    return os.path.join(video_id, 'img')
+def _image_dir(video_id, subdir=''):
+    return os.path.join(subdir, video_id, 'img')
+
+
+def _annot_file(video_id, object_id, subdir=''):
+    basename = _filename_from_object_id(object_id)
+    return os.path.join(subdir, video_id, basename)
 
 
 def _filename_from_object_id(object_id):
@@ -113,12 +120,13 @@ def _video_id_from_track_id(track_id):
     return parts[0]
 
 
-def _discover_tracks(dir):
-    subdirs = util.list_subdirs(dir)
-    for video_id in subdirs:
-        rect_files = fnmatch.filter(os.listdir(os.path.join(dir, video_id)), 'groundtruth_rect*')
+def _discover_tracks(dir, subdir=''):
+    video_ids = util.list_subdirs(os.path.join(dir, subdir))
+    for video_id in video_ids:
+        annot_dir = os.path.join(dir, subdir, video_id)
+        rect_files = fnmatch.filter(os.listdir(annot_dir), 'groundtruth_rect*')
         for rect_file in rect_files:
-            if os.stat(os.path.join(dir, video_id, rect_file)).st_size == 0:
+            if os.stat(os.path.join(dir, subdir, video_id, rect_file)).st_size == 0:
                 continue  # Skip empty files.
             object_id = _object_id_from_filename(rect_file)
             yield _make_track_id(video_id, object_id)
@@ -142,10 +150,10 @@ def _split_track_id(track_id):
 
 
 def _object_id_from_filename(fname):
-    basename, _ = os.path.splitext(fname)
-    if basename == 'groundtruth_rect':
+    root, _ = os.path.splitext(fname)
+    if root == 'groundtruth_rect':
         return ''
-    return _remove_prefix(basename, 'groundtruth_rect.')
+    return _remove_prefix(root, 'groundtruth_rect.')
 
 
 def _remove_prefix(s, pre):

@@ -53,7 +53,7 @@ def load_ilsvrc(dir, subset):
 
 
 def _image_file(subset, snippet_id):
-    parts = ['Data', 'VID', subset] + snippet_id.split('/') + ['{:06d}.JPEG']
+    parts = ['ILSVRC2015', 'Data', 'VID', subset] + snippet_id.split('/') + ['{:06d}.JPEG']
     return os.path.join(*parts)
 
 
@@ -69,7 +69,7 @@ def _load_snippets_train(dir, subset='train', num_classes=30):
 
 def _load_positive_snippets(dir, subset, class_num):
     set_file = '{}_{:d}.txt'.format(subset, class_num)
-    path = os.path.join(dir, 'ImageSets', 'VID', set_file)
+    path = os.path.join(dir, 'ILSVRC2015', 'ImageSets', 'VID', set_file)
     with open(path, 'r') as f:
         reader = csv.DictReader(f, delimiter=' ', fieldnames=['snippet_id', 'label'])
         rows = list(reader)
@@ -79,7 +79,7 @@ def _load_positive_snippets(dir, subset, class_num):
 
 def _load_snippets_val(dir, subset='val'):
     # For the val set, there is a file val.txt that lists all frames of all videos.
-    path = os.path.join(dir, 'ImageSets', 'VID', subset + '.txt')
+    path = os.path.join(dir, 'ILSVRC2015', 'ImageSets', 'VID', subset + '.txt')
     with open(path, 'r') as f:
         reader = csv.DictReader(f, delimiter=' ', fieldnames=['frame_name', 'frame_index'])
         rows = list(reader)
@@ -94,7 +94,7 @@ def _make_track_id(snippet_id, object_id):
 
 def _load_snippet_labels(dir, subset, snippet_id):
     n = _snippet_length(dir, subset, snippet_id)
-    dir_name = os.path.join(dir, 'Annotations', 'VID', subset, snippet_id)
+    dir_name = os.path.join(dir, 'ILSVRC2015', 'Annotations', 'VID', subset, snippet_id)
 
     labels = {}
     for t in range(n):
@@ -119,13 +119,13 @@ def _load_snippet_labels(dir, subset, snippet_id):
         # absent = [track_id for track_id in labels.keys() if t not in labels[track_id]]
         for track_id in labels.keys():
             if t not in labels[track_id]:
-                labels[track_id][t] = dataset.make_frame_label(absent=False)
+                labels[track_id][t] = dataset.make_frame_label(absent=True)
 
     return labels, {'width': imwidth, 'height': imheight}
 
 
 def _snippet_length(dir, subset, snippet_id):
-    dir_name = os.path.join(dir, 'Data', 'VID', subset, snippet_id)
+    dir_name = os.path.join(dir, 'ILSVRC2015', 'Data', 'VID', subset, snippet_id)
     image_files = fnmatch.filter(os.listdir(dir_name), '*.JPEG')
     return len(image_files)
 

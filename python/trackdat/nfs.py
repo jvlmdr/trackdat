@@ -16,7 +16,7 @@ from . import util
 from . import dataset
 
 
-def load_nfs(dir, fps):
+def load_nfs(dir, fps=240):
     video_ids = _discover_tracks(dir, fps)
     if len(video_ids) == 0:
         raise RuntimeError('no tracks found')
