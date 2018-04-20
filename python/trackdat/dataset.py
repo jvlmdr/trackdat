@@ -34,6 +34,10 @@ def make_frame_label(rect=None, absent=False, extra=None):
     return frame
 
 
+def is_present(label):
+    return not label.get('absent', False)
+
+
 def label_convert_relative(frame_label, im_size):
     frame_label = dict(frame_label)
     if 'rect' in frame_label:

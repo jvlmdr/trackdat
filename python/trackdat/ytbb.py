@@ -36,11 +36,12 @@ def load_ytbb_sec(dir, subset, no_aspect=False, keep_pure_absent=False):
                 raise RuntimeError('timestamp not divisible by 1000: {}'.format(time_ms))
             t = time_ms // 1000
             if row['object_presence'] == 'present':
-                frame_label = dataset.make_rect(
-                    xmin=float(row['xmin']), xmax=float(row['xmax']),
-                    ymin=float(row['ymin']), ymax=float(row['ymax']))
+                frame_label = dataset.make_frame_label(
+                    rect=dataset.make_rect(
+                        xmin=float(row['xmin']), xmax=float(row['xmax']),
+                        ymin=float(row['ymin']), ymax=float(row['ymax'])))
             elif row['object_presence'] == 'absent':
-                frame_label = dict(present=False)
+                frame_label = dataset.make_frame_label(absent=True)
             else:
                 continue
             video_id_map[track_id] = row['youtube_id']
@@ -51,8 +52,9 @@ def load_ytbb_sec(dir, subset, no_aspect=False, keep_pure_absent=False):
                   if _num_present(track_labels) > 1}
         print('remove tracks without present labels: {} of {} remain'.format(len(labels), num_raw))
     track_ids = list(labels.keys())
-    video_ids = set(video_id_map.values())
-    print('num videos:', len(video_ids))
+    video_id_map = {track_id: video_id_map[track_id] for track_id in track_ids}
+    video_ids = set(video_id_map[track_id] for track_id in track_ids)
+    # print('num videos:', len(video_ids))
 
     # # Check if videos exist.
     # video_subset = set([video_id for video_id in video_ids
@@ -86,4 +88,4 @@ def _image_file(subset, video_id):
 
 
 def _num_present(labels):
-    return sum(1 for label in labels.values() if label.get('present', True))
+    return sum(1 for label in labels.values() if dataset.is_present(label))
