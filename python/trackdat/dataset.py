@@ -25,6 +25,10 @@ def make_rect_pix(xmin, ymin, xmax, ymax, imwidth, imheight):
 
 def make_frame_label(rect=None, absent=False, extra=None):
     frame = {}
+    # Interpret empty/reversed rectangle as absent.
+    if rect is not None and not is_non_empty(rect):
+        rect = None
+        absent = True
     if rect is not None:
         frame['rect'] = rect
     if absent:
@@ -36,6 +40,10 @@ def make_frame_label(rect=None, absent=False, extra=None):
 
 def is_present(label):
     return not label.get('absent', False)
+
+
+def is_non_empty(rect):
+    return rect['xmin'] < rect['xmax'] and rect['ymin'] < rect['ymax']
 
 
 def label_convert_relative(frame_label, im_size):
@@ -160,6 +168,9 @@ def load_rects_csv(f, fieldnames, init_time=None, delim=','):
         if time_is_field:
             t = int(row['time'])
         labels[t] = label_fn(row)
+        # if is_present(labels[t]):
+        #     assert is_non_empty(labels[t]['rect']), \
+        #         'bad rect from line \'{}\' in file \'{}\''.format(line.strip(), f.name)
         t += 1
     return labels
 
