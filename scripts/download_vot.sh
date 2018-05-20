@@ -16,10 +16,16 @@ mkdir -p "${dl}"
     cd "${dl}"
     base_url="http://data.votchallenge.net/vot${VOT_YEAR}/${VOT_CHALLENGE}"
     wget -c "${base_url}/description.json"
-    cat description.json | jq -r '.sequences[] | .channels.color.url' >zips.txt
-    mkdir -p videos
+    cat description.json | jq -r '.sequences[] | .annotations.url' >annotations.txt
+    cat description.json | jq -r '.sequences[] | .channels.color.url' >color.txt
+    mkdir -p annotations
     (
-        cd videos
-        cat ../zips.txt | xargs -P 4 -t -I{} wget -nv -c "${base_url}/{}"
+        cd annotations
+        cat ../annotations.txt | xargs -P 4 -t -I{} wget -nv -c "${base_url}/{}"
+    )
+    mkdir -p color
+    (
+        cd color
+        cat ../color.txt | xargs -P 4 -t -I{} wget -nv -c "${base_url}/{}"
     )
 )

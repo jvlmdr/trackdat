@@ -18,10 +18,24 @@ def main():
         dataset = json.load(f)
 
     for seq in dataset['sequences']:
-        filename = seq['channels']['color']['url'].split('/')[-1]
-        print('extract "{}"'.format(filename))
-        with zipfile.ZipFile(os.path.join(args.data_dir, 'videos', filename), 'r') as zf:
-            zf.extractall(os.path.join(args.dl_dir, seq['name']))
+        annotations_zip = os.path.join(args.data_dir, 'annotations',
+                                       http_basename(seq['annotations']['url']))
+        color_zip = os.path.join(args.data_dir, 'color',
+                                 http_basename(seq['channels']['color']['url']))
+        dst_dir = os.path.join(args.dl_dir, seq['name'])
+        extract(annotations_zip, dst_dir)
+        extract(color_zip, dst_dir)
+
+
+def extract(filename, dir=None):
+    print('extract "{}"'.format(filename))
+    with zipfile.ZipFile(filename, 'r') as zf:
+        zf.extractall(dir)
+
+
+def http_basename(s):
+    return s.split('/')[-1]
+
 
 if __name__ == '__main__':
     main()
