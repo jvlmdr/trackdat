@@ -1,13 +1,18 @@
 #!/bin/bash
 
 # Use environment variable to set year.
-VOT_YEAR="${VOT_YEAR:-2017}"
+VOT_YEAR="${VOT_YEAR:-2018}"
+VOT_CHALLENGE="${VOT_CHALLENGE:-main}"
 
-dl="$(readlink -m "${1:-"./dl/vot${VOT_YEAR}"}")"
-data="$(readlink -m "${2:-"./data/vot${VOT_YEAR}"}")"
+if [ "${VOT_CHALLENGE}" == "main" ]; then
+    name="vot${VOT_YEAR}"
+else
+    name="vot${VOT_YEAR}_${VOT_CHALLENGE}"
+fi
 
-mkdir -p "${data}"
-(
-    cd "${data}"
-    unzip -o "${dl}/vot${VOT_YEAR}.zip"
-)
+dl="${1:-"./dl/${name}"}"
+data="${2:-"./data/${name}"}"
+scripts="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+mkdir -p "${data}" || exit 1
+python "$scripts/unzip_vot.py" "$dl" "$data"
