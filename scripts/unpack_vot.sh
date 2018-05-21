@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Use environment variable to set year.
+# For unpacking, these are only used for the default name.
 VOT_YEAR="${VOT_YEAR:-2018}"
 VOT_CHALLENGE="${VOT_CHALLENGE:-main}"
 
@@ -15,4 +16,5 @@ data="${2:-"./data/${name}"}"
 scripts="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 mkdir -p "${data}" || exit 1
+cp "${dl}/description.json" "${data}/"|| exit 1
 python "$scripts/unzip_vot.py" "$dl" "$data"
