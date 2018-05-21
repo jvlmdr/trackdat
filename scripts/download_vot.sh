@@ -18,6 +18,7 @@ mkdir -p "${dl}"
     wget -c "${base_url}/description.json"
     cat description.json | jq -r '.sequences[] | .annotations.url' >annotations.txt
     cat description.json | jq -r '.sequences[] | .channels.color.url' >color.txt
+    cat description.json | jq -r '.sequences[] | .name' >list.txt
     mkdir -p annotations
     (
         cd annotations
