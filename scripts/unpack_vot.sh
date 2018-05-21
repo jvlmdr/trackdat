@@ -15,4 +15,5 @@ data="${2:-"./data/${name}"}"
 scripts="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 mkdir -p "${data}" || exit 1
+cp "${dl}/description.json" "${data}/"|| exit 1
 python "$scripts/unzip_vot.py" "$dl" "$data"
