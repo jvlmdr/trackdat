@@ -1,7 +1,7 @@
 '''
 
 Expects directory structure:
-    list.txt
+    description.json (or list.txt)
     {video}/{frame:08d}.jpg
     {video}/groundtruth.txt
 '''
@@ -10,6 +10,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import json
 import os
 
 from . import dataset
@@ -34,10 +35,19 @@ def load_vot(dir):
 
 
 def _load_tracks(dir):
-    with open(os.path.join(dir, 'list.txt'), 'r') as f:
-        lines = f.readlines()
-    # Strip whitespace and remove empty lines.
-    return list(filter(bool, map(str.strip, lines)))
+    if not (os.path.exists(os.path.join(dir, 'description.json')) or
+            os.path.exists(os.path.join(dir, 'list.txt'))):
+        raise RuntimeError('could not find description.json or list.txt in "{}"'.format(dir))
+    try:
+        with open(os.path.join(dir, 'description.json'), 'r') as f:
+            description = json.load(f)
+        lines = [seq['name'] for seq in description['sequences']]
+    except IOError:
+        with open(os.path.join(dir, 'list.txt'), 'r') as f:
+            lines = f.readlines()
+        # Strip whitespace and remove empty lines.
+        lines = list(filter(bool, map(str.strip, lines)))
+    return lines
 
 
 def _annot_file(video_id):
