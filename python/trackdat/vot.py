@@ -11,6 +11,7 @@ from __future__ import division
 from __future__ import print_function
 
 import json
+import math
 import os
 
 from . import dataset
@@ -67,10 +68,14 @@ def _load_groundtruth(f, init_time=1):
     t = init_time
     for line in lines:
         r = _vot.convert_region(_vot.parse_region(line), 'rectangle')
-        # TODO: Confirm that we should subtract 1 here.
-        # Perhaps we should rather subtract and add 0.5 from min and max.
-        rect = dataset.make_rect(xmin=r.x - 1, xmax=r.x - 1 + r.width,
-                                 ymin=r.y - 1, ymax=r.y - 1 + r.height)
-        labels_pix[t] = dataset.make_frame_label(rect=rect)
+        if all(math.isnan(val) for val in [r.x, r.y, r.width, r.height]):
+            label = dataset.make_frame_label(absent=True)
+        else:
+            # TODO: Confirm that we should subtract 1 here.
+            # Perhaps we should rather subtract and add 0.5 from min and max.
+            rect = dataset.make_rect(xmin=r.x - 1, xmax=r.x - 1 + r.width,
+                                     ymin=r.y - 1, ymax=r.y - 1 + r.height)
+            label = dataset.make_frame_label(rect=rect)
+        labels_pix[t] = label
         t += 1
     return labels_pix
