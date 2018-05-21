@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Use environment variable to set year.
+# For unpacking, these are only used for the default name.
 VOT_YEAR="${VOT_YEAR:-2018}"
 VOT_CHALLENGE="${VOT_CHALLENGE:-main}"
 
