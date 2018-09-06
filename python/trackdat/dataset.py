@@ -148,6 +148,7 @@ def load_rects_csv(f, fieldnames, init_time=None, delim=','):
     '''
     re_delim = re.compile(delim)
     time_is_field = 'time' in fieldnames
+    absent_is_field = 'absent' in fieldnames
     if 'xmin' in fieldnames:
         if 'xmax' in fieldnames:
             label_fn = _rect_min_max
@@ -167,12 +168,30 @@ def load_rects_csv(f, fieldnames, init_time=None, delim=','):
         row = {k: v for k, v in zip(fieldnames, fields) if k}
         if time_is_field:
             t = int(row['time'])
-        labels[t] = label_fn(row)
+        if absent_is_field and _flexibool(row['absent']):
+            labels[t] = make_frame_label(absent=True)
+        else:
+            labels[t] = label_fn(row)
         # if is_present(labels[t]):
         #     assert is_non_empty(labels[t]['rect']), \
         #         'bad rect from line \'{}\' in file \'{}\''.format(line.strip(), f.name)
         t += 1
     return labels
+
+
+_TRUE_VALUES = {'1', 'true', 't', 'yes', 'y'}
+_FALSE_VALUES = {'0', 'false', 'f', 'no', 'n'}
+
+
+def _flexibool(s):
+    s = s.strip()
+    s = s.lower()
+    if s in _TRUE_VALUES:
+        return True
+    elif s in _FALSE_VALUES:
+        return False
+    else:
+        raise ValueError('unsupported boolean value: {}'.format(s))
 
 
 def _rect_min_size(row):
