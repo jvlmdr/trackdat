@@ -105,19 +105,6 @@ def from_dict(content):
     return Dataset(**content)
 
 
-class Serializer(object):
-    '''Provides dump() and load() functions like json, pickle and similar.'''
-
-    def __init__(self, codec):
-        self.codec = codec
-
-    def dump(self, x, f):
-        self.codec.dump(to_dict(x), f)
-
-    def load(self, f):
-        return from_dict(self.codec.load(f))
-
-
 def load_csv_dataset_simple(dir, load_videos_fn, annot_file_fn, image_file_fn,
                             fieldnames=None, init_time=None, delim=','):
     '''Load simple dataset (where each video has one track).'''
