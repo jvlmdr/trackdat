@@ -63,7 +63,13 @@ class Dataset(object):
 
     def __init__(self, track_ids, labels, image_files, aspects, video_id_map=None):
         '''
-        If track_id not found in video_id_map, then track_id is used as video_id.
+        Args:
+            track_ids: List of `track_id` strings.
+            labels: Dict that maps `track_id` to label dict.
+            image_files: Dict that maps `video_id` to format string.
+            aspects: Dict that maps `video_id` to float (width / height).
+            video_id_map: Dict that maps `track_id` to `video_id`.
+                If `track_id` is not found, then `track_id` is used as `video_id`.
         '''
         self._track_ids = track_ids
         self._labels = labels
