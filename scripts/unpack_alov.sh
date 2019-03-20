@@ -1,9 +1,11 @@
 #!/bin/bash
 
-dl="$(readlink -m "${1:-./dl/alov}")"
-data="$(readlink -m "${2:-./data/alov}")"
+dl="${1:-./dl/alov}"
+data="${2:-./data/alov}"
 
 mkdir -p "${data}"
+dl="$( cd "${dl}" && pwd )"
+# data="$( cd "${data}" && pwd )"
 (
     cd "${data}"
     unzip -o "${dl}/alov300++GT_txtFiles.zip" && \

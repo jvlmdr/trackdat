@@ -1,8 +1,9 @@
 #!/bin/bash
 
-dl="$(readlink -m "${1:-./dl/tlp}")"
+dl="${1:-./dl/tlp}"
 
 mkdir -p "${dl}"
+# dl="$( cd "${dl}" && pwd )"
 (
     cd "${dl}"
     wget -c https://amoudgl.github.io/tlp/datasets/index.html

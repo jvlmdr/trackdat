@@ -1,8 +1,9 @@
 #!/bin/bash
 
-dl="$(readlink -m "${1:-./dl/otb}")"
+dl="${1:-./dl/otb}"
 
 mkdir -p "${dl}"
+# dl="$( cd "${dl}" && pwd )"
 (
     cd "${dl}"
     wget -c "http://cvlab.hanyang.ac.kr/tracker_benchmark/datasets.html" || exit 1

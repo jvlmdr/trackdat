@@ -1,7 +1,7 @@
 #!/bin/bash
 
 dl="${1:-./dl}"
-scripts="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+scripts="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 set -x
 
@@ -21,3 +21,4 @@ bash "${scripts}/download_dtb70.sh" "${dl}/dtb70"
 bash "${scripts}/download_tlp.sh" "${dl}/tlp"
 bash "${scripts}/download_nfs.sh" "${dl}/nfs"
 bash "${scripts}/download_ilsvrc.sh" "${dl}/ilsvrc"
+bash "${scripts}/download_tracknet.sh" "${dl}/tracknet"

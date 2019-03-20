@@ -6,15 +6,15 @@ VOT_YEAR="${VOT_YEAR:-2018}"
 VOT_CHALLENGE="${VOT_CHALLENGE:-main}"
 
 if [ "${VOT_CHALLENGE}" == "main" ]; then
-    name="vot${VOT_YEAR}"
+    default_name="vot${VOT_YEAR}"
 else
-    name="vot${VOT_YEAR}_${VOT_CHALLENGE}"
+    default_name="vot${VOT_YEAR}_${VOT_CHALLENGE}"
 fi
 
-dl="${1:-"./dl/${name}"}"
-data="${2:-"./data/${name}"}"
+dl="${1:-"./dl/${default_name}"}"
+data="${2:-"./data/${default_name}"}"
 scripts="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-mkdir -p "${data}" || exit 1
+mkdir -p "${data}"
 cp "${dl}/description.json" "${data}/"|| exit 1
 python "$scripts/unzip_vot.py" "$dl" "$data"

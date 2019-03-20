@@ -1,9 +1,11 @@
 #!/bin/bash
 
-dl="$(readlink -m "${1:-./dl/tlp}")"
-data="$(readlink -m "${2:-./data/tlp}")"
+dl="${1:-./dl/tlp}"
+data="${2:-./data/tlp}"
 
 mkdir -p "${data}"
+dl="$( cd "${dl}" && pwd )"
+# data="$( cd "${data}" && pwd )"
 (
     cd "${data}"
     ls "${dl}"/videos/*.zip | xargs -t -n 1 unzip -q -o

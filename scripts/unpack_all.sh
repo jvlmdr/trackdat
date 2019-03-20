@@ -2,7 +2,7 @@
 
 dl="${1:-./dl}"
 data="${2:-./data}"
-scripts="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+scripts="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 set -x
 
@@ -22,3 +22,5 @@ bash "${scripts}/unpack_dtb70.sh" "${dl}/dtb70" "${data}/dtb70"
 bash "${scripts}/unpack_tlp.sh" "${dl}/tlp" "${data}/tlp"
 bash "${scripts}/unpack_nfs.sh" "${dl}/nfs" "${data}/nfs"
 bash "${scripts}/unpack_ilsvrc.sh" "${dl}/ilsvrc" "${data}/ilsvrc"
+TRACKNET_RATE=1 bash "${scripts}/unpack_tracknet.sh" "${dl}/tracknet" "${data}/tracknet"
+TRACKNET_RATE=10 bash "${scripts}/unpack_tracknet.sh" "${dl}/tracknet" "${data}/tracknet_10"

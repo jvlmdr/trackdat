@@ -1,9 +1,13 @@
 #!/bin/bash
 
-dl="$(readlink -m "${1:-./dl/ilsvrc}")"
-data="$(readlink -m "${2:-./data/ilsvrc}")"
+dl="${1:-./dl/ilsvrc}"
+data="${2:-./data/ilsvrc}"
 
 mkdir -p "${data}"
+
+dl="$( cd "${dl}" && pwd )"
+data="$( cd "${data}" && pwd )"
+
 (
     cd "${data}"
     tar -xzf "${dl}/ILSVRC2015_VID.tar.gz"
