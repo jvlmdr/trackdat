@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Use environment variable to set subsample rate.
-TRACKNET_RATE="${TRACKNET_RATE:-1}"
+TRACKINGNET_RATE="${TRACKINGNET_RATE:-1}"
 
-if [ "${TRACKNET_RATE}" -gt 1 ]; then
-    default_name="tracknet_${TRACKNET_RATE}"
+if [ "${TRACKINGNET_RATE}" -gt 1 ]; then
+    default_name="trackingnet_${TRACKINGNET_RATE}"
 else
-    default_name=tracknet
+    default_name=trackingnet
 fi
 
-dl="${1:-./dl/tracknet}"
+dl="${1:-./dl/trackingnet}"
 data="${2:-"./data/${default_name}"}"
 
 mkdir -p "${data}"
@@ -28,14 +28,14 @@ rsync -av "${dl}/data/" "${data}/" || exit 1
 rm -r "${data}"/*/zips || exit 1
 
 # Take subset of frames to reduce size.
-if [ "${TRACKNET_RATE}" -gt 1 ]; then
+if [ "${TRACKINGNET_RATE}" -gt 1 ]; then
     chunks="TEST $( seq 0 11 | xargs -I{} echo TRAIN_{} )"
     for chunk in $chunks; do
         (
             cd "$data/$chunk" && \
             find frames -type f -name '*.jpg' \
                 | sed -e 's/\.jpg$//' \
-                | awk -F/ '($3 % '"${TRACKNET_RATE}"' == 0) {print $2 "/" $3 ".jpg"}' \
+                | awk -F/ '($3 % '"${TRACKINGNET_RATE}"' == 0) {print $2 "/" $3 ".jpg"}' \
                 >subset.txt && \
             rm -rf frames_tmp && \
             mkdir frames_tmp && \

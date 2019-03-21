@@ -2,7 +2,7 @@
 
 # Invokes download_TrackingNet.py
 
-dl="${1:-./dl/tracknet}"
+dl="${1:-./dl/trackingnet}"
 
 mkdir -p "${dl}"
 dl="$( cd "${dl}" && pwd )"
