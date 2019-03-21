@@ -69,7 +69,7 @@ def load_ytbb_sec(dir, subset, no_aspect=False, keep_pure_absent=False):
     # labels = {track_id: labels[track_id] for track_id in track_subset}
     # video_id_map = {track_id: video_id_map[track_id] for track_id in track_subset}
 
-    image_file_fn = lambda v: _image_file(subset, v)
+    def image_file_fn(v): return _image_file(subset, v)
     # Rectangles are already in relative coordinates.
     # However we must read images to get aspect ratios.
     if no_aspect:

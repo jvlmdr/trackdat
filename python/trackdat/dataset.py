@@ -2,11 +2,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import logging
 import math
 import os
 import re
 
 from . import util
+
+logger = logging.getLogger(__name__)
 
 
 def make_rect(xmin, ymin, xmax, ymax):
@@ -121,9 +124,16 @@ def load_csv_dataset_simple(dir, load_videos_fn, annot_file_fn, image_file_fn,
     labels_pix = {}
     for video_id in video_ids:
         annot_file = os.path.join(dir, annot_file_fn(video_id))
-        with open(annot_file, 'r') as f:
-            labels_pix[video_id] = load_rects_csv(f, fieldnames=fieldnames,
-                                                  init_time=init_time, delim=delim)
+        try:
+            with open(annot_file, 'r') as f:
+                labels_pix[video_id] = load_rects_csv(f,
+                                                      fieldnames=fieldnames,
+                                                      init_time=init_time,
+                                                      delim=delim)
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except RuntimeError as ex:
+            raise RuntimeError('error loading rects from file "{}": {}'.format(annot_file, ex))
     labels, aspects = convert_relative(dir, video_ids, labels_pix, image_file_fn)
     return Dataset(
         track_ids=video_ids, labels=labels,
@@ -226,6 +236,17 @@ def _assert_rect_ok(rect):
         raise RuntimeError('expect xmin <= xmax: {}, {}'.format(rect['xmin'], rect['xmax']))
     if not rect['ymin'] <= rect['ymax']:
         raise RuntimeError('expect ymin <= ymax: {}, {}'.format(rect['ymin'], rect['ymax']))
+
+
+def _flip_rect_if_necessary(rect):
+    rect = dict(rect)
+    if rect['xmax'] < rect['xmin']:
+        logger.warning('flip inverted rect: xmin %g, xmax %g', rect['xmin'], rect['xmax'])
+        rect['xmin'], rect['xmax'] = rect['xmax'], rect['xmin']
+    if rect['ymax'] < rect['ymin']:
+        logger.warning('flip inverted rect: ymin %g, ymax %g', rect['ymin'], rect['ymax'])
+        rect['ymin'], rect['ymax'] = rect['ymax'], rect['ymin']
+    return rect
 
 
 def assert_image_files_exist(dir, dataset):
