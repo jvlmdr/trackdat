@@ -20,5 +20,5 @@ rm -r $temp
 ```
 To extract the dataset from `tar/original/vot2018.tar`, resize all images to fit within `480x480` and save to `tar/resize_fit_480x480/vot2018.tar`:
 ```
-sbatch scripts/slurm/resize.sh tar/ vot2018 fit 480x480
+bash scripts/resize_images.sh tar/ vot2018/ '480x480>'
 ```
